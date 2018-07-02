@@ -104,10 +104,10 @@ public class XGBModel {
 		}
 		timer.toc("featureExtractor init done");
 
-		// this.rankingsBlend = this.getRankingsBlendUU();
-		this.rankingsBlend = MLIOUtils.readObjectFromFile(
-				"/media/mvolkovs/external4TB/Data/recsys2018/models/blend/blend_uu_als_ii_cnn_5K_0.1865_0.3728_1.4064.out",
-				FloatElement[][].class);
+		this.rankingsBlend = this.getRankingsBlendUU();
+		// this.rankingsBlend = MLIOUtils.readObjectFromFile(
+		// "/media/mvolkovs/external4TB/Data/recsys2018/models/blend/blend_uu_als_ii_cnn_5K_0.1865_0.3728_1.4064.out",
+		// FloatElement[][].class);
 		timer.toc("ranking blend done");
 	}
 
