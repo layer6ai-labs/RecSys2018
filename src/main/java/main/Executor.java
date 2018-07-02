@@ -12,8 +12,9 @@ public class Executor {
 			String trainPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/train";
 			String testFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/test/challenge_set.json";
 			String extraInfoPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
-			String pythonScriptPath = "";
-			
+			String pythonScriptPath = "/home/mvolkovs/projects/vl6_recsys2018/script/svd_py.py";
+			String svdCache = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
+
 			MLTimer timer = new MLTimer("main");
 			timer.tic();
 
