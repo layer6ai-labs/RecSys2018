@@ -36,6 +36,9 @@ public class RecSysSplitter {
 	// Predict tracks for a playlist given its title and 100 random tracks
 
 	private static MLTimer timer = new MLTimer("RecSysSplitter");
+	static {
+		timer.toc();
+	}
 
 	public static void backFillSplit(final ParsedData data,
 			final SplitterCF split, final boolean testOnly) {

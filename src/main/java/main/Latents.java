@@ -25,9 +25,9 @@ public class Latents {
 	public MLDenseMatrix album;
 
 	public Latents() {
-		
+
 	}
-	
+
 	public Latents(final ParsedData data) throws Exception {
 		String dataPath = "/media/mvolkovs/external4TB/Data/recsys2018";
 
