@@ -36,8 +36,7 @@ public class Executor {
 			timer.toc("split done");
 
 			// get all latents
-			Latents latents = new Latents(dataParsed);
-			timer.toc("latents computed");
+			Latents latents = new Latents();
 
 			// WMF
 			ALSParams alsParams = new ALSParams();
@@ -53,6 +52,10 @@ public class Executor {
 
 			// SVD
 			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
+			svdModel.factorizeAlbums(pythonScriptPath, svdCache);
+			svdModel.factorizeArtists(pythonScriptPath, svdCache);
+			svdModel.factorizeNames(pythonScriptPath, svdCache);
+			timer.toc("latents computed");
 
 		} catch (Exception e) {
 			e.printStackTrace();
