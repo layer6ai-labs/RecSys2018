@@ -32,7 +32,8 @@ public class Executor {
 			timer.toc("split done");
 
 			// get all latents
-			Latents latents = new Latents();
+			Latents latents = new Latents(dataParsed);
+			timer.toc("latents computed");
 
 		} catch (Exception e) {
 			e.printStackTrace();
