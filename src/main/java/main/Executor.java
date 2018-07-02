@@ -13,7 +13,7 @@ public class Executor {
 			String testFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/test/challenge_set.json";
 			String extraInfoPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
 			String pythonScriptPath = "/home/mvolkovs/projects/vl6_recsys2018/script/svd_py.py";
-			String svdCache = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
+			String cachePath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
 
 			MLTimer timer = new MLTimer("main");
 			timer.tic();
@@ -52,10 +52,13 @@ public class Executor {
 
 			// SVD
 			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
-			svdModel.factorizeAlbums(pythonScriptPath, svdCache);
-			svdModel.factorizeArtists(pythonScriptPath, svdCache);
-			svdModel.factorizeNames(pythonScriptPath, svdCache);
+			svdModel.factorizeAlbums(pythonScriptPath, cachePath);
+			svdModel.factorizeArtists(pythonScriptPath, cachePath);
+			svdModel.factorizeNames(pythonScriptPath, cachePath);
 			timer.toc("latents computed");
+
+			// create training data
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
