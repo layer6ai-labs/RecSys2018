@@ -1,5 +1,7 @@
 package main;
 
+import common.ALS;
+import common.ALS.ALSParams;
 import common.MLTimer;
 import common.SplitterCF;
 
@@ -10,7 +12,8 @@ public class Executor {
 			String trainPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/train";
 			String testFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/test/challenge_set.json";
 			String extraInfoPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
-
+			String pythonScriptPath = "";
+			
 			MLTimer timer = new MLTimer("main");
 			timer.tic();
 
@@ -34,6 +37,21 @@ public class Executor {
 			// get all latents
 			Latents latents = new Latents(dataParsed);
 			timer.toc("latents computed");
+
+			// WMF
+			ALSParams alsParams = new ALSParams();
+			alsParams.alpha = 100;
+			alsParams.rank = 200;
+			alsParams.lambda = 0.001f;
+			alsParams.maxIter = 10;
+			ALS als = new ALS(alsParams);
+			als.optimize(split.getRstrain().get(ParsedData.INTERACTION_KEY),
+					null);
+			latents.U = als.getU();
+			latents.V = als.getV();
+
+			// SVD
+			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
 
 		} catch (Exception e) {
 			e.printStackTrace();
