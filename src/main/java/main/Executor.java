@@ -1,6 +1,7 @@
 package main;
 
 import common.MLTimer;
+import common.SplitterCF;
 
 public class Executor {
 
@@ -12,14 +13,24 @@ public class Executor {
 
 			MLTimer timer = new MLTimer("main");
 
+			// load data
 			Data data = DataLoader.load(trainPath, testFile);
 			timer.toc("data loaded");
 
 			ParsedDataLoader loader = new ParsedDataLoader(data);
+			loader.loadPlaylists();
+			loader.loadSongs();
 			loader.loadSongExtraInfo(extraInfoPath);
+			ParsedData dataParsed = loader.dataParsed;
 			timer.toc("data parsed");
-			
-			
+
+			// generate split
+			SplitterCF split = RecSysSplitter.getSplit(dataParsed);
+			split = RecSysSplitter.getSplitMatching(dataParsed, split);
+			RecSysSplitter.removeName(dataParsed, split);
+			timer.toc("split done");
+
+			// get all latents
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -36,7 +36,7 @@ public class ParsedDataLoader {
 		this.dataParsed = dataParsedP;
 	}
 
-	private void loadPlaylists() {
+	public void loadPlaylists() {
 		MLTimer timer = new MLTimer("loadPlaylists");
 		timer.tic();
 
