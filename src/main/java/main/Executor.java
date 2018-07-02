@@ -12,6 +12,7 @@ public class Executor {
 			String extraInfoPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
 
 			MLTimer timer = new MLTimer("main");
+			timer.tic();
 
 			// load data
 			Data data = DataLoader.load(trainPath, testFile);
@@ -31,6 +32,7 @@ public class Executor {
 			timer.toc("split done");
 
 			// get all latents
+			Latents latents = new Latents();
 
 		} catch (Exception e) {
 			e.printStackTrace();
