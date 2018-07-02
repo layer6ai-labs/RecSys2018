@@ -4,6 +4,7 @@ import common.ALS;
 import common.ALS.ALSParams;
 import common.MLTimer;
 import common.SplitterCF;
+import main.XGBModel.XGBModelParams;
 
 public class Executor {
 
@@ -35,30 +36,38 @@ public class Executor {
 			RecSysSplitter.removeName(dataParsed, split);
 			timer.toc("split done");
 
-			// get all latents
-			Latents latents = new Latents();
+//			// get all latents
+//			Latents latents = new Latents();
+//
+//			// WMF
+//			ALSParams alsParams = new ALSParams();
+//			alsParams.alpha = 100;
+//			alsParams.rank = 200;
+//			alsParams.lambda = 0.001f;
+//			alsParams.maxIter = 10;
+//			ALS als = new ALS(alsParams);
+//			als.optimize(split.getRstrain().get(ParsedData.INTERACTION_KEY),
+//					null);
+//			latents.U = als.getU();
+//			latents.V = als.getV();
+//
+//			// SVD
+//			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
+//			svdModel.factorizeAlbums(pythonScriptPath, cachePath);
+//			svdModel.factorizeArtists(pythonScriptPath, cachePath);
+//			svdModel.factorizeNames(pythonScriptPath, cachePath);
+//			timer.toc("latents computed");
 
-			// WMF
-			ALSParams alsParams = new ALSParams();
-			alsParams.alpha = 100;
-			alsParams.rank = 200;
-			alsParams.lambda = 0.001f;
-			alsParams.maxIter = 10;
-			ALS als = new ALS(alsParams);
-			als.optimize(split.getRstrain().get(ParsedData.INTERACTION_KEY),
-					null);
-			latents.U = als.getU();
-			latents.V = als.getV();
-
-			// SVD
-			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
-			svdModel.factorizeAlbums(pythonScriptPath, cachePath);
-			svdModel.factorizeArtists(pythonScriptPath, cachePath);
-			svdModel.factorizeNames(pythonScriptPath, cachePath);
-			timer.toc("latents computed");
-
-			// create training data
-			
+			// train second stage model
+			Latents latents = new Latents(dataParsed);
+			XGBModelParams xgbParams = new XGBModelParams();
+			xgbParams.doCreative = false;
+			xgbParams.xgbModel = cachePath + "xgb.model";
+			XGBModel model = new XGBModel(dataParsed, xgbParams, latents,
+					split);
+			model.extractFeatures2Stage(cachePath);
+			model.trainModel(cachePath);
+			model.inference2Stage();
 
 		} catch (Exception e) {
 			e.printStackTrace();

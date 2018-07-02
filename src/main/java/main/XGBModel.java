@@ -5,9 +5,11 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +24,7 @@ import common.FloatElement;
 import common.MLConcurrentUtils.Async;
 import common.MLDenseMatrix;
 import common.MLDenseVector;
+import common.MLIOUtils;
 import common.MLSparseFeature;
 import common.MLSparseMatrix;
 import common.MLSparseMatrixAOO;
@@ -33,6 +36,7 @@ import common.SplitterCF;
 import main.ParsedData.PlaylistFeature;
 import ml.dmlc.xgboost4j.java.Booster;
 import ml.dmlc.xgboost4j.java.DMatrix;
+import ml.dmlc.xgboost4j.java.XGBoost;
 
 public class XGBModel {
 
@@ -48,7 +52,6 @@ public class XGBModel {
 
 		public float validFrac = 0.1f;
 		public String xgbModel;
-		public String rankingFile;
 
 		public boolean doCreative = false;
 	}
@@ -101,7 +104,10 @@ public class XGBModel {
 		}
 		timer.toc("featureExtractor init done");
 
-		this.rankingsBlend = this.getRankingsBlendUU();
+		// this.rankingsBlend = this.getRankingsBlendUU();
+		this.rankingsBlend = MLIOUtils.readObjectFromFile(
+				"/media/mvolkovs/external4TB/Data/recsys2018/models/blend/blend_uu_als_ii_cnn_5K_0.1865_0.3728_1.4064.out",
+				FloatElement[][].class);
 		timer.toc("ranking blend done");
 	}
 
@@ -283,85 +289,43 @@ public class XGBModel {
 		}
 	}
 
-	private FloatElement[][] getRankingItemItem(final int[] playlistIndexes,
-			final int nItems, final float beta) {
-		// MLSparseMatrix Rtconcat = MLSparseMatrix.concatVertical(this.R,
-		// this.data.songFeatures.get(SongFeature.ARTIST_ID)
-		// .getFeatMatrix().transpose(),
-		// this.data.songFeatures.get(SongFeature.ALBUM_ID).getFeatMatrix()
-		// .transpose())
-		// .transpose();
+	public void trainModel(final String inPath) throws Exception {
+		DMatrix trainData = null;
+		DMatrix validData = null;
+		Booster model = null;
+		try {
+			trainData = new DMatrix(inPath + "/trainXGB");
+			validData = new DMatrix(inPath + "/validXGB");
 
-		MLSparseMatrix Rtconcat = this.R.transpose();
+			HashMap<String, DMatrix> eval = new HashMap<>();
+			eval.put("valid", validData);
 
-		MLSparseMatrix RtconcatNorm = Rtconcat.deepCopy();
-		RtconcatNorm.applyColNorm(RtconcatNorm.getColNorm(2));
-		RtconcatNorm.applyRowNorm(RtconcatNorm.getRowNorm(2));
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("eta", 0.1);
+			params.put("min_child_weight", 1);
+			params.put("max_depth", 10);
+			params.put("subsample", 1);
+			params.put("colsample_bytree", 0.6);
+			params.put("tree_method", "exact");
+			params.put("objective", "rank:pairwise");
+			params.put("base_score", 0.1);
+			params.put("eval_metric", "auc");
+			params.put("use_buffer", 0);
+			params.put("num_round", 150);
+			model = XGBoost.train(trainData, params, 150, eval, null, null);
+			model.saveModel(this.params.xgbModel);
 
-		MLDenseVector popularVec = Rtconcat.getRowSum();
-		popularVec.scalarDivide(popularVec.sum());
-		float[] popularity = popularVec.getValues();
-
-		FloatElement[][] rankingsLatent = EvaluatorCF.getRankingsNative(
-				this.split.getRstrain().get(ParsedData.INTERACTION_KEY),
-				playlistIndexes, this.split.getValidColIndexes(),
-				this.latents.U, this.latents.V, nItems, 500);
-
-		FloatElement[][] rankings = new FloatElement[this.R.getNRows()][];
-		AtomicInteger counter = new AtomicInteger(0);
-		AtomicInteger counterBackfilled = new AtomicInteger(0);
-		IntStream.range(0, playlistIndexes.length).parallel().forEach(index -> {
-			int count = counter.incrementAndGet();
-			if (count % 5_000 == 0) {
-				timer.tocLoop("inferenceItemItem", count);
+		} finally {
+			if (trainData != null) {
+				trainData.dispose();
 			}
-
-			int rowIndex = playlistIndexes[index];
-			MLSparseVector trainRow = this.R.getRow(rowIndex);
-
-			MLDenseVector colAvg = FeatureExtractor.getRowAvg(RtconcatNorm,
-					trainRow.getIndexes(), true);
-			float[] scores = new float[this.R.getNCols()];
-			for (int i = 0; i < scores.length; i++) {
-
-				// note: use unnormalized row here
-				MLSparseVector col = Rtconcat.getRow(i);
-				if (col != null) {
-					scores[i] = colAvg.mult(col)
-							* (float) Math.pow(popularity[i], -(1 - beta));
-				}
+			if (validData != null) {
+				validData.dispose();
 			}
-			rankings[rowIndex] = FloatElement.topNSort(scores, nItems,
-					trainRow.getIndexes());
-
-			// back fill with latent, if necessary
-			FloatElement[] rankingLatent = rankingsLatent[rowIndex];
-			Set<Integer> indexes = new HashSet<Integer>();
-			int cur = 0;
-			for (int i = 0; i < rankings[rowIndex].length; i++) {
-				FloatElement element = rankings[rowIndex][i];
-				if (element.getValue() > 0f) {
-					indexes.add(element.getIndex());
-				} else {
-					while (true) {
-						FloatElement elementLatent = rankingLatent[cur];
-						cur++;
-						if (indexes
-								.contains(elementLatent.getIndex()) == false) {
-							rankings[rowIndex][i] = new FloatElement(
-									elementLatent.getIndex(), 0);
-							indexes.add(elementLatent.getIndex());
-							counterBackfilled.incrementAndGet();
-							break;
-						}
-					}
-				}
+			if (model != null) {
+				model.dispose();
 			}
-		});
-		timer.tocLoop("inferenceItemItem", counter.get());
-		timer.toc("n back filled " + counterBackfilled.get());
-
-		return rankings;
+		}
 	}
 
 	public FloatElement[][] getRankingsBlendUU() throws Exception {
@@ -651,7 +615,7 @@ public class XGBModel {
 					}
 
 					int playlistIndex = targetRowIndices[index];
-					FloatElement[] rankingBlend = rankingsBlend[playlistIndex];
+					FloatElement[] rankingBlend = this.rankingsBlend[playlistIndex];
 
 					// re-rank first stage with xgb
 					MLSparseVector[] feats = new MLSparseVector[this.params.nCandidates2StageVL];
@@ -687,27 +651,17 @@ public class XGBModel {
 
 					}
 
-					// sort and store for sanity check
-					if (this.params.rankingFile == null) {
-						Arrays.sort(rankingBlend,
-								new FloatElement.ValueComparator(true));
-						rankingsBlend[playlistIndex] = rankingBlend;
-					}
-
 					Arrays.sort(ranking2Stage,
 							new FloatElement.ValueComparator(true));
 					rankings2Stage[playlistIndex] = ranking2Stage;
 				});
 		timer.tocLoop("inference2Stage", rowCounter.get());
 
-		if (this.params.rankingFile != null) {
-			MLSparseMatrix Rsplit = this.split.getRsvalid()
-					.get(ParsedData.INTERACTION_KEY);
-			for (int i = 0; i < Rsplit.getNRows(); i++) {
-				if (Arrays.binarySearch(this.split.getValidRowIndexes(),
-						i) < 0) {
-					Rsplit.setRow(null, i);
-				}
+		MLSparseMatrix Rsplit = this.split.getRsvalid()
+				.get(ParsedData.INTERACTION_KEY);
+		for (int i = 0; i < Rsplit.getNRows(); i++) {
+			if (Arrays.binarySearch(this.split.getValidRowIndexes(), i) < 0) {
+				Rsplit.setRow(null, i);
 			}
 		}
 
@@ -723,155 +677,6 @@ public class XGBModel {
 			ResultCF result = evaluator.evaluate(this.split,
 					ParsedData.INTERACTION_KEY, rankings2Stage);
 			System.out.println("2STAGE " + result.toString());
-		}
-	}
-
-	public void inferenceBlendUU() {
-
-		MLSparseMatrix Rtconcat = this.R.transpose();
-
-		MLSparseMatrix RtconcatNorm = Rtconcat.deepCopy();
-		RtconcatNorm.applyColNorm(RtconcatNorm.getColNorm(2));
-		RtconcatNorm.applyRowNorm(RtconcatNorm.getRowNorm(2));
-
-		MLDenseVector popularVec = Rtconcat.getRowSum();
-		popularVec.scalarDivide(popularVec.sum());
-		float[] popularity = popularVec.getValues();
-
-		final int N_SONGS_TO_RANK = 20_000;
-		final float ITEM_ITEM_BETA = 0.6f;
-
-		int[] validRowIndexes = this.split.getValidRowIndexes();
-		FloatElement[][] rankingsUserUser = this.getRankingUserUser(
-				validRowIndexes, N_SONGS_TO_RANK, 17_000, 0.9f);
-
-		timer.toc("rankingsUserUser done");
-
-		System.out.println("USER-USER");
-		for (EvaluatorCF evaluator : this.evaluators) {
-			ResultCF result = evaluator.evaluate(this.split,
-					ParsedData.INTERACTION_KEY, rankingsUserUser);
-			System.out.println(result.toString());
-		}
-		System.out.println();
-
-		FloatElement[][] rankingsLatent = new FloatElement[this.R.getNRows()][];
-		FloatElement[][] rankingsLatentCNN = new FloatElement[this.R
-				.getNRows()][];
-		FloatElement[][] rankingsItemItem = new FloatElement[this.R
-				.getNRows()][];
-		AtomicInteger counter = new AtomicInteger(0);
-		IntStream.range(0, validRowIndexes.length).parallel().forEach(index -> {
-			int count = counter.incrementAndGet();
-			if (count % 1_000 == 0) {
-				timer.tocLoop("inference", count);
-			}
-
-			int playlistIndex = validRowIndexes[index];
-			MLSparseVector row = this.R.getRow(playlistIndex);
-
-			// compute all the scores
-			MLDenseVector colAvg = FeatureExtractor.getRowAvg(RtconcatNorm,
-					row.getIndexes(), true);
-			FloatElement[] rankingUserUser = rankingsUserUser[playlistIndex];
-			FloatElement[] rankingLatent = new FloatElement[N_SONGS_TO_RANK];
-			FloatElement[] rankingLatentCNN = new FloatElement[N_SONGS_TO_RANK];
-			FloatElement[] rankingItemItem = new FloatElement[N_SONGS_TO_RANK];
-			for (int i = 0; i < N_SONGS_TO_RANK; i++) {
-				int songIndex = rankingUserUser[i].getIndex();
-				float score = 0;
-
-				// latent
-				score = this.latents.U.getRow(playlistIndex)
-						.mult(this.latents.V.getRow(songIndex));
-				rankingLatent[i] = new FloatElement(songIndex, score);
-
-				// item-item
-				score = 0;
-				MLSparseVector col = Rtconcat.getRow(songIndex);
-				if (col != null) {
-					score = colAvg.mult(col) * (float) Math
-							.pow(popularity[songIndex], -(1 - ITEM_ITEM_BETA));
-				}
-				rankingItemItem[i] = new FloatElement(songIndex, score);
-
-				// latent CNN
-				score = this.latents.Ucnn.getRow(playlistIndex)
-						.mult(this.latents.Vcnn.getRow(songIndex));
-				rankingLatentCNN[i] = new FloatElement(songIndex, score);
-			}
-
-			rankingsLatent[playlistIndex] = rankingLatent;
-			rankingsItemItem[playlistIndex] = rankingItemItem;
-			rankingsLatentCNN[playlistIndex] = rankingLatentCNN;
-		});
-
-		FloatElement.standardize(rankingsUserUser);
-		FloatElement.standardize(rankingsLatent);
-		FloatElement.standardize(rankingsItemItem);
-		FloatElement.standardize(rankingsLatentCNN);
-
-		double bestScore = 0;
-		float[] weights = new float[] { 0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
-		for (int i = 0; i < weights.length; i++) {
-			for (int j = 0; j < weights.length; j++) {
-				for (int k = 0; k < weights.length; k++) {
-					for (int m = 0; m < weights.length; m++) {
-
-						float[] curWeights = new float[] { weights[i],
-								weights[j], weights[k], weights[m] };
-						// float[] curWeights = new float[] { 0.4f, 0.5f, 0.2f,
-						// 0.5f };
-
-						FloatElement[][] blend = new FloatElement[this.R
-								.getNRows()][];
-						IntStream.range(0, validRowIndexes.length).parallel()
-								.forEach(index -> {
-									int rowIndex = validRowIndexes[index];
-									FloatElement[] rankingBlend = new FloatElement[N_SONGS_TO_RANK];
-									for (int s = 0; s < N_SONGS_TO_RANK; s++) {
-										float blendScore = 0;
-										blendScore = curWeights[0]
-												* rankingsUserUser[rowIndex][s]
-														.getValue()
-												+ curWeights[1]
-														* rankingsLatent[rowIndex][s]
-																.getValue()
-												+ curWeights[2]
-														* rankingsItemItem[rowIndex][s]
-																.getValue()
-												+ curWeights[3]
-														* rankingsLatentCNN[rowIndex][s]
-																.getValue();
-
-										rankingBlend[s] = new FloatElement(
-												rankingsUserUser[rowIndex][s]
-														.getIndex(),
-												blendScore);
-									}
-									Arrays.sort(rankingBlend,
-											new FloatElement.ValueComparator(
-													true));
-									blend[rowIndex] = rankingBlend;
-								});
-						ResultCF result = this.evaluators[0].evaluate(
-								this.split, ParsedData.INTERACTION_KEY, blend);
-						double[] resultVals = result.get();
-						if (resultVals[resultVals.length - 1] > bestScore) {
-							bestScore = resultVals[resultVals.length - 1];
-
-							System.out.println(
-									"WEIGHTS " + Arrays.toString(curWeights));
-							for (EvaluatorCF evaluator : this.evaluators) {
-								result = evaluator.evaluate(this.split,
-										ParsedData.INTERACTION_KEY, blend);
-								System.out.println(result.toString());
-							}
-							System.out.println();
-						}
-					}
-				}
-			}
 		}
 	}
 
