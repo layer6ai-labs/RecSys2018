@@ -54,5 +54,11 @@
 			<version>2.2.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>ml_core</groupId>
+			<artifactId>ml_core</artifactId>
+			<version>cpu_0.0.2-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 </project>

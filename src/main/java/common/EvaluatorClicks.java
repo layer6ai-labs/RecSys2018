@@ -3,6 +3,8 @@ package common;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+import linalg.FloatElement;
+
 
 public class EvaluatorClicks extends EvaluatorCF {
 

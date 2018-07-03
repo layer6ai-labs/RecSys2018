@@ -20,7 +20,6 @@ import common.EvaluatorCF;
 import common.EvaluatorClicks;
 import common.EvaluatorRPrecision;
 import common.EvaluatorRPrecisionArtist;
-import common.FloatElement;
 import common.MLConcurrentUtils.Async;
 import common.MLDenseMatrix;
 import common.MLDenseVector;
@@ -33,6 +32,7 @@ import common.MLTimer;
 import common.MLXGBoost;
 import common.ResultCF;
 import common.SplitterCF;
+import linalg.FloatElement;
 import main.ParsedData.PlaylistFeature;
 import ml.dmlc.xgboost4j.java.Booster;
 import ml.dmlc.xgboost4j.java.DMatrix;
@@ -104,10 +104,10 @@ public class XGBModel {
 		}
 		timer.toc("featureExtractor init done");
 
-		this.rankingsBlend = this.getRankingsBlendUU();
-		// this.rankingsBlend = MLIOUtils.readObjectFromFile(
-		// "/media/mvolkovs/external4TB/Data/recsys2018/models/blend/blend_uu_als_ii_cnn_5K_0.1865_0.3728_1.4064.out",
-		// FloatElement[][].class);
+		// this.rankingsBlend = this.getRankingsBlendUU();
+		this.rankingsBlend = MLIOUtils.readObjectFromFile(
+				"/media/mvolkovs/external4TB/Data/recsys2018/models/blend/blend_uu_als_ii_cnn_5K_0.1865_0.3728_1.4064.out",
+				FloatElement[][].class);
 		timer.toc("ranking blend done");
 	}
 
