@@ -47,7 +47,7 @@ String authToken = "";
 // path to song audio feature file, if doing creative track submission
 String creativeTrackFile = "/home/recsys2018/data/song_audio_features.txt";
 
-// path to MPD directory with all the JSON files
+// path to MPD directory with the JSON files
 String trainPath = "/home/recsys2018/data/train/";
 
 // path to challenge set JSON file
@@ -56,7 +56,7 @@ String testFile = "/home/recsys2018/data/test/challenge_set.json";
 // path to python SVD script included in the repo, default location: script/svd_py.py
 String pythonScriptPath = "/home/recsys2018/script/svd_py.py";
 
-//path to cache folder for temp storage
+//path to cache folder for temp storage, at least 20GB should be available in this folder
 String cachePath = "/home/recsys2018/cache/";
 ```
 
