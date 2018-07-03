@@ -75,8 +75,14 @@ public class RecSysSplitter {
 					int nTracksTotal = (int) data.playlistFeatures
 							.get(PlaylistFeature.N_TRACKS)
 							.getRow(testIndex, false).getValues()[0];
-					int nTracksTrain = data.interactions.getRow(testIndex)
-							.getIndexes().length;
+					float[] valuesTest = data.interactions.getRow(testIndex)
+							.getValues();
+					// int nTracksTrain = data.interactions.getRow(testIndex)
+					// .getIndexes().length;
+					int nTracksTrain = 0;
+					for (float value : valuesTest) {
+						nTracksTrain += value;
+					}
 
 					// find training playlists with nTracksTotal
 					List<Integer> exact = new LinkedList<Integer>();
