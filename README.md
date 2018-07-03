@@ -64,7 +64,7 @@ mvn clean compile
 mvn exec:java -Dexec.mainClass="main.Executor" 
 ```
 Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`. For the creative track we extracted extra song features from the 
-[Spotify Audio API](https://developer.spotify.com/documentation/web-api/reference/tracks/get-several-audio-features/). We were able to match most songs from the challenge Million Playlist Dataset, and used the following fields for further feature extraction: `[acousticness, danceability, energy, instrumentalness, key, liveness, loudness, mode, speechiness, tempo, time_signature, valence]`. In order to download the data for this track, you need to get the auth key from 
+[Spotify Audio API](https://developer.spotify.com/documentation/web-api/reference/tracks/get-several-audio-features/). We were able to match most songs from the challenge Million Playlist Dataset, and used the following fields for further feature extraction: `[acousticness, danceability, energy, instrumentalness, key, liveness, loudness, mode, speechiness, tempo, time_signature, valence]`. In order to download the data for this track, you need to get the OAuth Token from 
 [Spotify API page](https://developer.spotify.com/console/get-audio-features-several-tracks/?ids=4JpKVNYnVcJ8tuMKjAj50A,2NRANZE9UCmPAS5XVbXL40,24JygzOLM0EmRQeGtFcIcG) and
 assign it to the AUTH_TOKEN variable inside the `Executor.downloadCreativeData` function.
 
