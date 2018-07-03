@@ -19,7 +19,7 @@ import okhttp3.Response;
 
 public class Executor {
 
-	private static void downloadCretiveData(final Data dataLoaded,
+	private static void downloadCreativeData(final Data dataLoaded,
 			final String outFile) throws Exception {
 
 		final String AUTH_TOKEN = "Bearer BQAuDtl8KFXIsv02Uhm7AtYxNg8qMu72mhXgf8mQK61YDZ0jUb8RvGFpeo2PijBYM8PJZngBjUAWInrVhkcC0elkWvrFx3vsUJo3rU_8HjftS6jcH7yGQCAjOWTjM7_DnBGa2gqYf0Xgiq00_JqQ-Izj7UD98Nk";
@@ -152,7 +152,7 @@ public class Executor {
 			// download creative track features if not there
 			if (xgbParams.doCreative == true
 					&& new File(creativeTrackFile).exists() == false) {
-				downloadCretiveData(data, creativeTrackFile);
+				downloadCreativeData(data, creativeTrackFile);
 			}
 
 			ParsedDataLoader loader = new ParsedDataLoader(data);
