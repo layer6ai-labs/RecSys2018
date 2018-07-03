@@ -37,209 +37,10 @@ public class RecSysSplitter {
 
 	private static MLTimer timer = new MLTimer("RecSysSplitter");
 	static {
-		timer.toc();
+		timer.tic();
 	}
 
-	public static void backFillSplit(final ParsedData data,
-			final SplitterCF split, final boolean testOnly) {
-
-		MLSparseMatrix Rtrain = split.getRstrain()
-				.get(ParsedData.INTERACTION_KEY);
-		MLSparseMatrix Rvalid = split.getRsvalid()
-				.get(ParsedData.INTERACTION_KEY);
-
-		System.out.println("before back fill nnz train: " + Rtrain.getNNZ()
-				+ "  nnz valid:" + Rvalid.getNNZ() + "  nValidRows:"
-				+ split.getValidRowIndexes().length);
-		IntStream.range(0, data.interactions.getNRows()).parallel()
-				.forEach(rowIndex -> {
-					if (Arrays.binarySearch(split.getValidRowIndexes(),
-							rowIndex) >= 0) {
-						// don't change validation rows
-						return;
-					}
-
-					MLSparseVector row = data.interactions.getRow(rowIndex);
-					if (row != null) {
-						// use full data for the rest
-						if (testOnly == true) {
-							if (Arrays.binarySearch(data.testIndexes,
-									rowIndex) >= 0) {
-								// only back fill test rows
-								Rtrain.setRow(row.deepCopy(), rowIndex);
-								Rvalid.setRow(null, rowIndex);
-							}
-						} else {
-							Rtrain.setRow(row.deepCopy(), rowIndex);
-							Rvalid.setRow(null, rowIndex);
-						}
-					}
-				});
-
-		System.out.println("after back fill nnz train: " + Rtrain.getNNZ()
-				+ "  nnz valid:" + Rvalid.getNNZ());
-	}
-
-	public static SplitterCF getSplit(final ParsedData data) {
-
-		Map<String, MLSparseMatrix> temp = new HashMap<String, MLSparseMatrix>();
-		temp.put(ParsedData.INTERACTION_KEY, data.interactions);
-
-		SplitterCF split = new SplitterCF();
-		split.splitFrac(temp, 0.1f, 5, null, true, 20_000,
-				data.interactions.getNCols());
-
-		MLSparseMatrix Rtrain = split.getRstrain()
-				.get(ParsedData.INTERACTION_KEY);
-		MLSparseMatrix Rvalid = split.getRsvalid()
-				.get(ParsedData.INTERACTION_KEY);
-
-		Set<Integer> validRowIndexes = new HashSet<Integer>();
-		AtomicInteger nExact = new AtomicInteger(0);
-		AtomicInteger counter = new AtomicInteger(0);
-		IntStream.range(0, data.testIndexes.length).parallel()
-				.forEach(index -> {
-					int count = counter.incrementAndGet();
-					if (count % 1000 == 0) {
-						System.out.println(count + " done");
-					}
-
-					int testIndex = data.testIndexes[index];
-					if (data.interactions.getRow(testIndex) == null) {
-						// skip cold start
-						return;
-					}
-
-					int nTracksTotal = (int) data.playlistFeatures
-							.get(PlaylistFeature.N_TRACKS)
-							.getRow(testIndex, false).getValues()[0];
-					int nTracksTrain = data.interactions.getRow(testIndex)
-							.getIndexes().length;
-
-					// find training playlists with nTracksTotal
-					List<Integer> exact = new LinkedList<Integer>();
-					for (int i = 0; i < data.interactions.getNRows(); i++) {
-						if (Arrays.binarySearch(data.testIndexes, i) >= 0) {
-							// don't split test playlists
-							continue;
-						}
-
-						MLSparseVector row = data.interactions.getRow(i);
-						if (row.getIndexes().length == nTracksTotal) {
-							exact.add(i);
-						}
-					}
-					Collections.shuffle(exact, new Random(index));
-
-					int repeat = 0;
-					while (repeat < 1) {
-						Integer validIndex = null;
-						synchronized (validRowIndexes) {
-							if (validIndex == null && exact.size() > 0) {
-								while (exact.size() > 0) {
-									int candIndex = exact.remove(0);
-									if (validRowIndexes
-											.contains(candIndex) == false) {
-										validIndex = candIndex;
-										nExact.incrementAndGet();
-										break;
-									}
-								}
-							}
-
-							if (validIndex == null) {
-								// no rows with nTracksTotal
-								break;
-							}
-							validRowIndexes.add(validIndex);
-							repeat++;
-						}
-
-						// re-split the validIndex row
-						MLSparseVector row = data.interactions
-								.getRow(validIndex);
-						int[] indexes = row.getIndexes();
-						float[] values = row.getValues();
-						long[] dates = row.getDates();
-
-						Set<Integer> validIndexes = new HashSet<Integer>();
-						MLMatrixElement[] elements = new MLMatrixElement[indexes.length];
-						for (int i = 0; i < indexes.length; i++) {
-							elements[i] = new MLMatrixElement(validIndex,
-									indexes[i], values[i], dates[i]);
-						}
-
-						if (isInRandomOrder(testIndex) == false) {
-							// split by position
-							Arrays.sort(elements,
-									new MLMatrixElement.DateComparator(true));
-						} else {
-							// random order split
-							MLRandomUtils.shuffle(elements, new Random(index));
-						}
-
-						for (int i = 0; i < nTracksTotal - nTracksTrain; i++) {
-							validIndexes.add(elements[i].getColIndex());
-						}
-
-						int jtrain = 0;
-						int[] indexesTrain = new int[nTracksTrain];
-						float[] valuesTrain = new float[nTracksTrain];
-						long[] datesTrain = new long[nTracksTrain];
-
-						int jvalid = 0;
-						int[] indexesValid = new int[nTracksTotal
-								- nTracksTrain];
-						float[] valuesValid = new float[nTracksTotal
-								- nTracksTrain];
-						long[] datesValid = new long[nTracksTotal
-								- nTracksTrain];
-
-						for (int i = 0; i < indexes.length; i++) {
-							if (validIndexes.contains(indexes[i]) == true) {
-								indexesValid[jvalid] = indexes[i];
-								valuesValid[jvalid] = values[i];
-								datesValid[jvalid] = dates[i];
-								jvalid++;
-
-							} else {
-								indexesTrain[jtrain] = indexes[i];
-								valuesTrain[jtrain] = values[i];
-								datesTrain[jtrain] = dates[i];
-								jtrain++;
-							}
-						}
-
-						// update split matrices
-						Rtrain.setRow(
-								new MLSparseVector(indexesTrain, valuesTrain,
-										datesTrain, Rtrain.getNCols()),
-								validIndex);
-						Rvalid.setRow(
-								new MLSparseVector(indexesValid, valuesValid,
-										datesValid, Rvalid.getNCols()),
-								validIndex);
-					}
-				});
-
-		System.out.println("nExact: " + nExact);
-
-		// update validation row indexes
-		int[] validRowIndexesArr = new int[validRowIndexes.size()];
-		int cur = 0;
-		for (int index : validRowIndexes) {
-			validRowIndexesArr[cur] = index;
-			cur++;
-		}
-		Arrays.sort(validRowIndexesArr);
-		split.setValidRowIndexes(validRowIndexesArr);
-
-		return split;
-
-	}
-
-	public static SplitterCF getSplitMatching(final ParsedData data,
-			final SplitterCF split) {
+	public static SplitterCF getSplitMatching(final ParsedData data) {
 
 		// init with full data
 		MLSparseVector[] trainRows = new MLSparseVector[data.interactions
@@ -253,17 +54,7 @@ public class RecSysSplitter {
 			}
 		}
 
-		// copy validation from existing split
-		int[] validRowIndexes = split.getValidRowIndexes();
-		for (int i = 0; i < split.getValidRowIndexes().length; i++) {
-			int index = validRowIndexes[i];
-
-			trainRows[index] = split.getRstrain()
-					.get(ParsedData.INTERACTION_KEY).getRow(index).deepCopy();
-			validRows[index] = split.getRsvalid()
-					.get(ParsedData.INTERACTION_KEY).getRow(index).deepCopy();
-		}
-
+		List<Integer> validIndexList = new LinkedList<Integer>();
 		Set<Integer> addedIndexes = new HashSet<Integer>();
 		AtomicInteger nExact = new AtomicInteger(0);
 		AtomicInteger nAtLeast = new AtomicInteger(0);
@@ -293,11 +84,6 @@ public class RecSysSplitter {
 					for (int i = 0; i < data.interactions.getNRows(); i++) {
 						if (Arrays.binarySearch(data.testIndexes, i) >= 0) {
 							// don't split test playlists
-							continue;
-						}
-
-						if (Arrays.binarySearch(validRowIndexes, i) >= 0) {
-							// don't split target valid playlists
 							continue;
 						}
 
@@ -345,6 +131,9 @@ public class RecSysSplitter {
 								break;
 							}
 							addedIndexes.add(validIndex);
+							if (repeat == 0) {
+								validIndexList.add(validIndex);
+							}
 							repeat++;
 						}
 
@@ -426,10 +215,24 @@ public class RecSysSplitter {
 		SplitterCF newSplit = new SplitterCF();
 		newSplit.setRstrain(trainMap);
 		newSplit.setRsvalid(validMap);
+
+		int[] validRowIndexes = new int[validIndexList.size()];
+		int cur = 0;
+		for (int index : validIndexList) {
+			validRowIndexes[cur] = index;
+			cur++;
+		}
+
+		int[] validColIndexes = new int[data.interactions.getNCols()];
+		for (int i = 0; i < data.interactions.getNCols(); i++) {
+			validColIndexes[i] = i;
+		}
+
 		newSplit.setValidRowIndexes(validRowIndexes);
-		newSplit.setValidColIndexes(split.getValidColIndexes());
+		newSplit.setValidColIndexes(validColIndexes);
 
 		System.out.println("nExact: " + nExact + "  nAtLeast: " + nAtLeast);
+		System.out.println("validRowIndexes: " + validRowIndexes.length);
 		System.out.println(
 				"nnz full:" + data.interactions.getNNZ() + "  nnz train: "
 						+ Rtrain.getNNZ() + "  nnz valid:" + Rvalid.getNNZ());

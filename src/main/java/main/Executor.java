@@ -156,8 +156,7 @@ public class Executor {
 			timer.toc("data parsed");
 
 			// generate split
-			SplitterCF split = RecSysSplitter.getSplit(dataParsed);
-			split = RecSysSplitter.getSplitMatching(dataParsed, split);
+			SplitterCF split = RecSysSplitter.getSplitMatching(dataParsed);
 			RecSysSplitter.removeName(dataParsed, split);
 			timer.toc("split done");
 
