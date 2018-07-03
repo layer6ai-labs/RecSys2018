@@ -5,14 +5,9 @@
 Contact: maks@layer6.ai
 
 <p align="center">
-<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/recsys2018_vl6/blob/master/logos/layer6ai-logo.png" width="180" height="150"></a>
-<a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/recsys2018_vl6/blob/master/logos/vector.jpg" width="180" height="150"></a>
+<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/layer6ai-logo.png" width="180" height="150"></a>
+<a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/vector.jpg" width="180" height="150"></a>
 </p>
-
-## Table of Contents  
-0. [Introduction](#intro)  
-1. [Environment](#env)
-2. [Executing](#executing)
 
 <a name="intro"/>
 
