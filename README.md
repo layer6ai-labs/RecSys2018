@@ -48,7 +48,7 @@ String trainPath = "/home/recsys2018/data/train/";
 String testFile = "/home/recsys2018/data/test/challenge_set.json";
 
 // path to song audio feature file if doing creative track submission
-String extraInfoPath = "/home/recsys2018/data/song_audio_features.txt";
+String pythonScriptPath = "/home/recsys2018/data/song_audio_features.txt";
 
 // path to python SVD script included in the repo, default location: script/svd_py.py
 String pythonScriptPath = "/home/recsys2018/script/svd_py.py";
