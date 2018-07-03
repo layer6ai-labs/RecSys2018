@@ -68,5 +68,6 @@ export MAVEN_OPTS="-Xms150g -Xmx150g"
 mvn clean compile
 mvn exec:java -Dexec.mainClass="main.Executor" 
 ```
-Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`.
+Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`. Also note that for this project we prioritized speed over memory so you'll 
+need at least 100GB of RAM to train and generate submission.
 
