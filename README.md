@@ -12,9 +12,7 @@ Contact: maks@layer6.ai
 ## Table of Contents  
 0. [Introduction](#intro)  
 1. [Environment](#env)
-2. [Dataset](#dataset)
 2. [Executing](#executing)
-4. [Results](#results)
 
 <a name="intro"/>
 
@@ -41,5 +39,34 @@ The model is implemented in Java and tested on the following environment:
 
 <a name="dataset"/>
 
+## Executing
 
+All models are executed from `src/main/java/main/Executor.java`, the main function has examples on 
+how to do main and creative track model training, evaluation and submission. To run the model:
+
+* Set all paths:
+```
+// path to MPD directory with all the JSON files
+String trainPath = "/home/recsys2018/data/train/";
+
+// path to challenge set JSON file
+String testFile = "/home/recsys2018/data/test/challenge_set.json";
+
+// path to song audio feature file if doing creative track submission
+String extraInfoPath = "/home/recsys2018/data/song_audio_features.txt";
+
+// path to python SVD script included in the repo, default location: script/svd_py.py
+String pythonScriptPath = "/home/recsys2018/script/svd_py.py";
+
+//path to cache folder for temp storage
+String cachePath = "/home/recsys2018/cache/";
+```
+
+* Compile and execute with maven:
+```
+export MAVEN_OPTS="-Xms150g -Xmx150g"
+mvn clean compile
+mvn exec:java -Dexec.mainClass="main.Executor" 
+```
+Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`.
 
