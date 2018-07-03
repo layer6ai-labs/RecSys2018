@@ -222,6 +222,7 @@ public class RecSysSplitter {
 			validRowIndexes[cur] = index;
 			cur++;
 		}
+		Arrays.sort(validRowIndexes);
 
 		int[] validColIndexes = new int[data.interactions.getNCols()];
 		for (int i = 0; i < data.interactions.getNCols(); i++) {
