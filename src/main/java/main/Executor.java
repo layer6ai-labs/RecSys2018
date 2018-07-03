@@ -10,18 +10,14 @@ import common.ALS.ALSParams;
 import common.MLTimer;
 import common.SplitterCF;
 import main.XGBModel.XGBModelParams;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class Executor {
 
-	private static void downloadCreativeData(final Data dataLoaded,
-			final String outFile) throws Exception {
-
+	private static void downloadCreativeData(Data dataLoaded, String outFile)
+			throws IOException {
 		final String AUTH_TOKEN = "Bearer BQAuDtl8KFXIsv02Uhm7AtYxNg8qMu72mhXgf8mQK61YDZ0jUb8RvGFpeo2PijBYM8PJZngBjUAWInrVhkcC0elkWvrFx3vsUJo3rU_8HjftS6jcH7yGQCAjOWTjM7_DnBGa2gqYf0Xgiq00_JqQ-Izj7UD98Nk";
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(outFile))) {
@@ -30,7 +26,6 @@ public class Executor {
 			int batchSize = Math.floorDiv(nSongs, 100);
 			OkHttpClient client = new OkHttpClient();
 
-			JSONParser parser = new JSONParser(JSONParser.USE_INTEGER_STORAGE);
 			int countss = 0;
 			for (int batch = 0; batch < batchSize; batch++) {
 				if (countss == 2)
@@ -73,11 +68,9 @@ public class Executor {
 				}
 				String jsonData = responses.body().string();
 				jsonData = append + jsonData + last;
+				org.json.JSONArray jsonarray = new org.json.JSONArray(jsonData);
 
-				JSONArray jsonarray = (JSONArray) parser.parse(jsonData);
-
-				if (((JSONObject) (jsonarray.get(0)))
-						.containsKey("error") == true) {
+				if (jsonarray.getJSONObject(0).has("error")) {
 					System.out.println("timed out pausing for a while.");
 					try {
 						Thread.sleep(4000 + 1000);
@@ -89,15 +82,14 @@ public class Executor {
 						}
 						jsonData = responses.body().string();
 						jsonData = append + jsonData + last;
-						jsonarray = (JSONArray) parser.parse(jsonData);
+						jsonarray = new org.json.JSONArray(jsonData);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 
 				}
-				if (((JSONObject) (jsonarray.get(0)))
-						.containsKey("error") == true) {
-					System.out.println(jsonarray.get(0));
+				if (jsonarray.getJSONObject(0).has("error")) {
+					System.out.println(jsonarray.getJSONObject(0));
 					// Now our key has timed out . SO lets just exit
 					bw.close();
 					System.out.println(
@@ -106,8 +98,8 @@ public class Executor {
 					System.exit(1);
 				}
 
-				JSONArray jsonobject = (JSONArray) ((JSONObject) (jsonarray
-						.get(0))).get("audio_features");
+				org.json.JSONArray jsonobject = (org.json.JSONArray) jsonarray
+						.getJSONObject(0).get("audio_features");
 				String writeString = jsonobject.toString();
 				if (batch == 0) {
 					writeString = writeString.replace("]", ",");
