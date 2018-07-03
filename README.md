@@ -41,14 +41,17 @@ how to do main and creative track model training, evaluation and submission. To 
 
 * Set all paths:
 ```
+//OAuth token for spotify creative api, if doing creative track submission
+String authToken = "";
+
+// path to song audio feature file, if doing creative track submission
+String creativeTrackFile = "/home/recsys2018/data/song_audio_features.txt";
+
 // path to MPD directory with all the JSON files
 String trainPath = "/home/recsys2018/data/train/";
 
 // path to challenge set JSON file
 String testFile = "/home/recsys2018/data/test/challenge_set.json";
-
-// path to song audio feature file if doing creative track submission
-String pythonScriptPath = "/home/recsys2018/data/song_audio_features.txt";
 
 // path to python SVD script included in the repo, default location: script/svd_py.py
 String pythonScriptPath = "/home/recsys2018/script/svd_py.py";
@@ -66,5 +69,7 @@ mvn exec:java -Dexec.mainClass="main.Executor"
 Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`. For the creative track we extracted extra song features from the 
 [Spotify Audio API](https://developer.spotify.com/documentation/web-api/reference/tracks/get-several-audio-features/). We were able to match most songs from the challenge Million Playlist Dataset, and used the following fields for further feature extraction: `[acousticness, danceability, energy, instrumentalness, key, liveness, loudness, mode, speechiness, tempo, time_signature, valence]`. In order to download the data for this track, you need to get the OAuth Token from 
 [Spotify API page](https://developer.spotify.com/console/get-audio-features-several-tracks/?ids=4JpKVNYnVcJ8tuMKjAj50A,2NRANZE9UCmPAS5XVbXL40,24JygzOLM0EmRQeGtFcIcG) and
-assign it to the OAuth_Token variable inside the `Executor.downloadCreativeData` function.
+assign it to the `authToken` variable in the `Executor.main` function.
+
+We prioritized speed over memory for this project so you'll need at least 100GB of RAM to run model training and inference. The full end-to-end runtime takes approximately 1.5 days.
 
