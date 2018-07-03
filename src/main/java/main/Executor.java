@@ -18,7 +18,7 @@ public class Executor {
 
 	private static void downloadCreativeData(Data dataLoaded, String outFile)
 			throws IOException {
-                //Please provide your own key here in the format shown below
+		// Please provide your own key here in the format shown below
 		final String AUTH_TOKEN = "Bearer BQAuDtl8KFXIsv02Uhm7AtYxNg8qMu72mhXgf8mQK61YDZ0jUb8RvGFpeo2PijBYM8PJZngBjUAWInrVhkcC0elkWvrFx3vsUJo3rU_8HjftS6jcH7yGQCAjOWTjM7_DnBGa2gqYf0Xgiq00_JqQ-Izj7UD98Nk";
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(outFile))) {
@@ -27,10 +27,10 @@ public class Executor {
 			int batchSize = Math.floorDiv(nSongs, 100);
 			OkHttpClient client = new OkHttpClient();
 
-
 			for (int batch = 0; batch < batchSize; batch++) {
-				
-				// uncomment and provide batch number from where to begin in case the operation was terminated due to auth expiration
+
+				// uncomment and provide batch number from where to begin in
+				// case the operation was terminated due to auth expiration
 				/*
 				 * if(batch <33207) continue;
 				 */
@@ -161,31 +161,32 @@ public class Executor {
 			RecSysSplitter.removeName(dataParsed, split);
 			timer.toc("split done");
 
-			// // get all latents
-			// Latents latents = new Latents();
-			//
-			// // WMF
-			// ALSParams alsParams = new ALSParams();
-			// alsParams.alpha = 100;
-			// alsParams.rank = 200;
-			// alsParams.lambda = 0.001f;
-			// alsParams.maxIter = 10;
-			// ALS als = new ALS(alsParams);
-			// als.optimize(split.getRstrain().get(ParsedData.INTERACTION_KEY),
-			// null);
-			// latents.U = als.getU();
-			// latents.V = als.getV();
-			//
+			// get all latents
+			Latents latents = new Latents();
+
+			// WMF
+			ALSParams alsParams = new ALSParams();
+			alsParams.alpha = 100;
+			alsParams.rank = 200;
+			alsParams.lambda = 0.001f;
+			alsParams.maxIter = 10;
+			ALS als = new ALS(alsParams);
+			als.optimize(split.getRstrain().get(ParsedData.INTERACTION_KEY),
+					null);
+			latents.U = als.getU();
+			latents.Ucnn = als.getU();
+			latents.V = als.getV();
+			latents.Vcnn = als.getV();
 
 			// SVD on album, artist and name
-			// SVDModel svdModel = new SVDModel(dataParsed, split, latents);
-			// svdModel.factorizeAlbums(pythonScriptPath, cachePath);
-			// svdModel.factorizeArtists(pythonScriptPath, cachePath);
-			// svdModel.factorizeNames(pythonScriptPath, cachePath);
-			// timer.toc("latents computed");
+			SVDModel svdModel = new SVDModel(dataParsed, split, latents);
+			svdModel.factorizeAlbums(pythonScriptPath, cachePath);
+			svdModel.factorizeArtists(pythonScriptPath, cachePath);
+			svdModel.factorizeNames(pythonScriptPath, cachePath);
+			timer.toc("latents computed");
 
 			// train second stage model
-			Latents latents = new Latents(dataParsed);
+			// Latents latents = new Latents(dataParsed);
 			XGBModel model = new XGBModel(dataParsed, xgbParams, latents,
 					split);
 			model.extractFeatures2Stage(cachePath);
