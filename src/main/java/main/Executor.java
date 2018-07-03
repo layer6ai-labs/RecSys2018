@@ -185,7 +185,8 @@ public class Executor {
 			// latents.U = als.getU();
 			// latents.V = als.getV();
 			//
-			// // SVD
+
+			// SVD on album, artist and name
 			// SVDModel svdModel = new SVDModel(dataParsed, split, latents);
 			// svdModel.factorizeAlbums(pythonScriptPath, cachePath);
 			// svdModel.factorizeArtists(pythonScriptPath, cachePath);
