@@ -18,8 +18,9 @@ public class Executor {
 
 	private static void downloadCreativeData(Data dataLoaded, String outFile)
 			throws IOException {
-		// Please provide your own key here in the format shown below
-		final String AUTH_TOKEN = "Bearer BQAuDtl8KFXIsv02Uhm7AtYxNg8qMu72mhXgf8mQK61YDZ0jUb8RvGFpeo2PijBYM8PJZngBjUAWInrVhkcC0elkWvrFx3vsUJo3rU_8HjftS6jcH7yGQCAjOWTjM7_DnBGa2gqYf0Xgiq00_JqQ-Izj7UD98Nk";
+		// Please provide your own key here
+		String OAuth_Token = "BQANfUFIkKng2XRABk9Cdn9NurJC-eYIHMcEvxA5cEGT6MhU2JGkdlig1xYwc08uIkO5jQDhJUOE5jlb5taHkgSDezNe1__s9MhZimslCBSs53xPRxeyoZTfZ_EcPQJN2JKwPepVgsVlJDULUf3NFSiuLKi9ISw";
+        	final String AUTH_TOKEN = "Bearer "+OAuth_Token;
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(outFile))) {
 
