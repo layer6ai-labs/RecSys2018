@@ -124,9 +124,10 @@ public class Executor {
 	public static void main(final String[] args) {
 		try {
 			String authToken = "";
+			String creativeTrackFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
+
 			String trainPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/train";
 			String testFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/test/challenge_set.json";
-			String creativeTrackFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
 			String pythonScriptPath = "/home/mvolkovs/projects/vl6_recsys2018/script/svd_py.py";
 			String cachePath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
 

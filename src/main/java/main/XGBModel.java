@@ -352,7 +352,7 @@ public class XGBModel {
 			targetRowIndexes[arrIndex] = index;
 			arrIndex++;
 		}
-		timer.toc("nrakings " + targetRowIndexes.length);
+		timer.toc("nrankings " + targetRowIndexes.length);
 
 		final int BLEND_NCANDS = 20_000;
 		final int BLEND_N_TO_STORE = 5_000;
