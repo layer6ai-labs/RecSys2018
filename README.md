@@ -9,11 +9,6 @@ Contact: maks@layer6.ai
 <a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/recsys2018_vl6/blob/master/logos/vector.jpg" width="180" height="150"></a>
 </p>
 
-## Table of Contents  
-0. [Introduction](#intro)  
-1. [Environment](#env)
-2. [Executing](#executing)
-
 <a name="intro"/>
 
 ## Introduction
