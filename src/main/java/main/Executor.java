@@ -18,6 +18,7 @@ public class Executor {
 
 	private static void downloadCreativeData(Data dataLoaded, String outFile)
 			throws IOException {
+                //Please provide your own key here in the format shown below
 		final String AUTH_TOKEN = "Bearer BQAuDtl8KFXIsv02Uhm7AtYxNg8qMu72mhXgf8mQK61YDZ0jUb8RvGFpeo2PijBYM8PJZngBjUAWInrVhkcC0elkWvrFx3vsUJo3rU_8HjftS6jcH7yGQCAjOWTjM7_DnBGa2gqYf0Xgiq00_JqQ-Izj7UD98Nk";
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(outFile))) {
@@ -26,12 +27,10 @@ public class Executor {
 			int batchSize = Math.floorDiv(nSongs, 100);
 			OkHttpClient client = new OkHttpClient();
 
-			int countss = 0;
+
 			for (int batch = 0; batch < batchSize; batch++) {
-				if (countss == 2)
-					break;
-				countss++;
-				// uncomment and provide batch number from where to begin
+				
+				// uncomment and provide batch number from where to begin in case the operation was terminated due to auth expiration
 				/*
 				 * if(batch <33207) continue;
 				 */
