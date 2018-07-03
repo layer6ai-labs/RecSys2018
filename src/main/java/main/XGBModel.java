@@ -58,7 +58,7 @@ public class XGBModel {
 
 	private static MLTimer timer = new MLTimer("XGBModel");
 	static {
-		timer.toc();
+		timer.tic();
 	}
 
 	private ParsedData data;
