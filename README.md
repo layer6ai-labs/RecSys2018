@@ -63,7 +63,7 @@ export MAVEN_OPTS="-Xms150g -Xmx150g"
 mvn clean compile
 mvn exec:java -Dexec.mainClass="main.Executor" 
 ```
-Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`. In order to download the data for the creative track, please get the auth key from [Spotify API page] (https://developer.spotify.com/console/get-audio-features-several-tracks/?ids=4JpKVNYnVcJ8tuMKjAj50A,2NRANZE9UCmPAS5XVbXL40,24JygzOLM0EmRQeGtFcIcG) and
+Note that by default the code is executing model for the main track, to run the creative track model set `xgbParams.doCreative = true`. In order to download the data for the creative track, please get the auth key from [Spotify API page](https://developer.spotify.com/console/get-audio-features-several-tracks/?ids=4JpKVNYnVcJ8tuMKjAj50A,2NRANZE9UCmPAS5XVbXL40,24JygzOLM0EmRQeGtFcIcG) and
 assign it to the AUTH_TOKEN variable inside the Executor.downloadCreativeData function. Also note that for this project we prioritized speed over memory so you'll 
 need at least 100GB of RAM to train and generate submission.
 
