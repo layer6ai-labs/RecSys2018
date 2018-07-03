@@ -16,11 +16,10 @@ import okhttp3.Response;
 
 public class Executor {
 
-	private static void downloadCreativeData(Data dataLoaded, String outFile)
-			throws IOException {
+	private static void downloadCreativeData(Data dataLoaded, String outFile,
+			String authToken) throws IOException {
 		// Please provide your own key here
-		String OAuth_Token = "BQANfUFIkKng2XRABk9Cdn9NurJC-eYIHMcEvxA5cEGT6MhU2JGkdlig1xYwc08uIkO5jQDhJUOE5jlb5taHkgSDezNe1__s9MhZimslCBSs53xPRxeyoZTfZ_EcPQJN2JKwPepVgsVlJDULUf3NFSiuLKi9ISw";
-        	final String AUTH_TOKEN = "Bearer "+OAuth_Token;
+		final String AUTH_TOKEN = "Bearer " + authToken;
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(outFile))) {
 
@@ -124,6 +123,7 @@ public class Executor {
 
 	public static void main(final String[] args) {
 		try {
+			String authToken = "";
 			String trainPath = "/media/mvolkovs/external4TB/Data/recsys2018/data/train";
 			String testFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/test/challenge_set.json";
 			String creativeTrackFile = "/media/mvolkovs/external4TB/Data/recsys2018/data/song_audio_features.txt";
@@ -144,7 +144,7 @@ public class Executor {
 			// download creative track features if not there
 			if (xgbParams.doCreative == true
 					&& new File(creativeTrackFile).exists() == false) {
-				downloadCreativeData(data, creativeTrackFile);
+				downloadCreativeData(data, creativeTrackFile, authToken);
 			}
 
 			ParsedDataLoader loader = new ParsedDataLoader(data);
