@@ -460,14 +460,6 @@ public class XGBModel {
 					});
 		}
 
-		MLSparseMatrix Rsplit = this.split.getRsvalid()
-				.get(ParsedData.INTERACTION_KEY);
-		for (int i = 0; i < Rsplit.getNRows(); i++) {
-			if (Arrays.binarySearch(this.split.getValidRowIndexes(), i) < 0) {
-				Rsplit.setRow(null, i);
-			}
-		}
-
 		// sanity check
 		System.out.println("BLENDUU");
 		for (EvaluatorCF evaluator : this.evaluators) {
