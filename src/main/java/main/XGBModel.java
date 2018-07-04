@@ -637,14 +637,6 @@ public class XGBModel {
 				});
 		timer.tocLoop("inference2Stage", rowCounter.get());
 
-		MLSparseMatrix Rsplit = this.split.getRsvalid()
-				.get(ParsedData.INTERACTION_KEY);
-		for (int i = 0; i < Rsplit.getNRows(); i++) {
-			if (Arrays.binarySearch(this.split.getValidRowIndexes(), i) < 0) {
-				Rsplit.setRow(null, i);
-			}
-		}
-
 		// blend
 		for (EvaluatorCF evaluator : this.evaluators) {
 			ResultCF result = evaluator.evaluate(this.split,
