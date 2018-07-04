@@ -16,33 +16,35 @@ public class EvaluatorClicks extends EvaluatorCF {
 
 		double[] clicks = new double[] { 0.0 };
 		int maxThresh = this.getMaxEvalThresh();
+		int[] validRowIndexes = split.getValidRowIndexes();
 		MLSparseMatrix validMatrix = split.getRsvalid().get(interactionType);
 		AtomicInteger nTotal = new AtomicInteger(0);
-		IntStream.range(0, validMatrix.getNRows()).parallel()
-				.forEach(rowIndex -> {
-					MLSparseVector row = validMatrix.getRow(rowIndex);
-					FloatElement[] rowPreds = preds[rowIndex];
+		IntStream.range(0, validRowIndexes.length).parallel().forEach(index -> {
 
-					if (row == null || rowPreds == null) {
-						return;
-					}
-					nTotal.incrementAndGet();
-					int[] targetIndexes = row.getIndexes();
+			int rowIndex = validRowIndexes[index];
+			MLSparseVector row = validMatrix.getRow(rowIndex);
+			FloatElement[] rowPreds = preds[rowIndex];
 
-					int matchIndex = (int) Math.floor(maxThresh / 10.0) + 1;
+			if (row == null || rowPreds == null) {
+				return;
+			}
+			nTotal.incrementAndGet();
+			int[] targetIndexes = row.getIndexes();
 
-					for (int i = 0; i < maxThresh; i++) {
-						if (Arrays.binarySearch(targetIndexes,
-								rowPreds[i].getIndex()) >= 0) {
-							matchIndex = (int) Math.floor(i / 10.0);
-							break;
-						}
-					}
+			int matchIndex = (int) Math.floor(maxThresh / 10.0) + 1;
 
-					synchronized (clicks) {
-						clicks[0] += matchIndex;
-					}
-				});
+			for (int i = 0; i < maxThresh; i++) {
+				if (Arrays.binarySearch(targetIndexes,
+						rowPreds[i].getIndex()) >= 0) {
+					matchIndex = (int) Math.floor(i / 10.0);
+					break;
+				}
+			}
+
+			synchronized (clicks) {
+				clicks[0] += matchIndex;
+			}
+		});
 
 		clicks[0] = clicks[0] / nTotal.get();
 		return new ResultCF("clicks", clicks, nTotal.get());

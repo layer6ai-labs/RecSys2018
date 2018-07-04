@@ -640,7 +640,7 @@ public class XGBModel {
 		// blend
 		for (EvaluatorCF evaluator : this.evaluators) {
 			ResultCF result = evaluator.evaluate(this.split,
-					ParsedData.INTERACTION_KEY, rankingsBlend);
+					ParsedData.INTERACTION_KEY, this.rankingsBlend);
 			System.out.println("BLEND " + result.toString());
 		}
 
