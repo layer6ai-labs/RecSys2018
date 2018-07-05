@@ -28,8 +28,8 @@ public class SVDModel {
 		this.latents = latentsP;
 	}
 
-	public void factorizeNames(final String scriptPath,
-			final String cachePath) throws Exception {
+	public void factorizeNames(final String scriptPath, final String cachePath)
+			throws Exception {
 		MLSparseMatrix playlistNames = this.data.playlistFeatures
 				.get(PlaylistFeature.NAME_REGEXED).getFeatMatrix();
 		timer.toc("nNames " + playlistNames.getNCols());
@@ -84,8 +84,8 @@ public class SVDModel {
 		SVDParams svdParams = new SVDParams();
 		svdParams.svdIter = 4;
 		svdParams.rank = 200;
-		svdParams.scriptPath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/svd_py.py";
-		svdParams.cachePath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
+		svdParams.scriptPath = scriptPath;
+		svdParams.cachePath = cachePath;
 		svdParams.shapeRows = nameMatrix.getNRows();
 		svdParams.shapeCols = nameMatrix.getNCols();
 		SVD svd = new SVD(svdParams);
@@ -97,8 +97,8 @@ public class SVDModel {
 		this.latents.name = svd.Q;
 	}
 
-	public void factorizeAlbums(final String scriptPath,
-			final String cachePath) throws Exception {
+	public void factorizeAlbums(final String scriptPath, final String cachePath)
+			throws Exception {
 		MLSparseMatrix songAlbums = this.data.songFeatures
 				.get(SongFeature.ALBUM_ID).getFeatMatrix();
 		timer.toc("nAlbums " + songAlbums.getNCols());
@@ -152,8 +152,8 @@ public class SVDModel {
 		SVDParams svdParams = new SVDParams();
 		svdParams.svdIter = 4;
 		svdParams.rank = 200;
-		svdParams.scriptPath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/svd_py.py";
-		svdParams.cachePath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
+		svdParams.scriptPath = scriptPath;
+		svdParams.cachePath = cachePath;
 		svdParams.shapeRows = albumMatrix.getNRows();
 		svdParams.shapeCols = albumMatrix.getNCols();
 		SVD svd = new SVD(svdParams);
@@ -220,8 +220,8 @@ public class SVDModel {
 		SVDParams svdParams = new SVDParams();
 		svdParams.svdIter = 4;
 		svdParams.rank = 200;
-		svdParams.scriptPath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/svd_py.py";
-		svdParams.cachePath = "/media/mvolkovs/external4TB/Data/recsys2018/models/svd/";
+		svdParams.scriptPath = scriptPath;
+		svdParams.cachePath = cachePath;
 		svdParams.shapeRows = artistMatrix.getNRows();
 		svdParams.shapeCols = artistMatrix.getNCols();
 		SVD svd = new SVD(svdParams);
