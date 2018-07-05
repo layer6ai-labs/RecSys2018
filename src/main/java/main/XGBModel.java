@@ -132,9 +132,9 @@ public class XGBModel {
 		AtomicInteger totalPosSampled = new AtomicInteger(0);
 		AtomicInteger totalNegSampled = new AtomicInteger(0);
 		try (BufferedWriter writerTrain = new BufferedWriter(
-				new FileWriter(outPath + "/trainXGB"));
+				new FileWriter(outPath + "trainXGB"));
 				BufferedWriter writerValid = new BufferedWriter(
-						new FileWriter(outPath + "/validXGB"))) {
+						new FileWriter(outPath + "validXGB"))) {
 
 			int batchSize = 20_000;
 			int nBatches = (int) Math
@@ -282,8 +282,8 @@ public class XGBModel {
 		DMatrix validData = null;
 		Booster model = null;
 		try {
-			trainData = new DMatrix(inPath + "/trainXGB");
-			validData = new DMatrix(inPath + "/validXGB");
+			trainData = new DMatrix(inPath + "trainXGB");
+			validData = new DMatrix(inPath + "validXGB");
 
 			HashMap<String, DMatrix> eval = new HashMap<>();
 			eval.put("valid", validData);
