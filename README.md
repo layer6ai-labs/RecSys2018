@@ -1,6 +1,6 @@
 # ACM RecSys Challenge 2018 Team vl6
 
-**Team members**: Maksims Volkovs, Himanshu Rai, Zhaoyue Cheng, Yichao Lu, Wu Ga
+**Team members**: Maksims Volkovs, Himanshu Rai, Zhaoyue Cheng, Yichao Lu, Wu Ga, Scott Sanner
 
 Contact: maks@layer6.ai
 
