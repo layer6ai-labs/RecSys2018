@@ -354,7 +354,7 @@ public class XGBModel {
 		int nBatches = (int) Math
 				.ceil(((double) targetRowIndexes.length / batchSize));
 
-		final float[] WEIGHTS = new float[] { 0.3f, 0.3f, 0.1f, 0.4f };
+		final float[] WEIGHTS = new float[] { 0.2f, 0.15f, 0.1f, 0.15f };
 		AtomicInteger counter = new AtomicInteger(0);
 		FloatElement[][] rankingsBlend = new FloatElement[this.R.getNRows()][];
 		for (int batch = 0; batch < nBatches; batch++) {

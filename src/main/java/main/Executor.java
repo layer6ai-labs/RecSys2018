@@ -192,7 +192,7 @@ public class Executor {
 					split);
 			model.extractFeatures2Stage(cachePath);
 			model.trainModel(cachePath);
-			model.inference2Stage();
+			model.submission2Stage(cachePath + "submission.out");
 
 		} catch (Exception e) {
 			e.printStackTrace();
