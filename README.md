@@ -1,6 +1,6 @@
-# ACM RecSys Challenge 2018 Team vl6
+# 2018 ACM RecSys Challenge 1'st Place Team vl6
 
-**Team members**: Maksims Volkovs, Himanshu Rai, Zhaoyue Cheng, Yichao Lu (University of Toronto), Ga Wu (University of Toronto, Vector Institute), Scott Sanner (University of Toronto, Vector Institute)
+**Team members**: Maksims Volkovs, Himanshu Rai, Zhaoyue Cheng, Yichao Lu (University of Toronto), Ga Wu (University of Toronto, Vector Institute), Scott Sanner (University of Toronto, Vector Institute) [(paper)](http://www.cs.toronto.edu/~mvolkovs/recsys2018_challenge.pdf)
 
 Contact: maks@layer6.ai
 
