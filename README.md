@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/DropoutNet/blob/master/logs/logobox.jpg" width="120" height="80"></a>
+<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/DropoutNet/blob/master/logs/logobox.jpg" width="130" height="80"></a>
 <a href="https://www.utoronto.ca//"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/UofT.jpg" width="120" height="80"></a>
 <a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/vector.jpg" width="120" height="80"></a>
 </p>
