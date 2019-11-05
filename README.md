@@ -1,10 +1,10 @@
 <p align="center">
-<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/layer6ai-logo.png" width="120" height="100"></a>
+<a href="https://layer6.ai/"><img src="https://github.com/layer6ai-labs/DropoutNet/blob/master/logs/logobox.jpg" width="120" height="100"></a>
 <a href="https://www.utoronto.ca//"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/UofT.jpg" width="120" height="110"></a>
 <a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/vector.jpg" width="120" height="100"></a>
 </p>
 
-## [2018 ACM RecSys Challenge](http://www.recsyschallenge.com/2018) 1'st Place Solution For Team vl6 [[paper](http://www.cs.toronto.edu/~mvolkovs/recsys2018_challenge.pdf)]
+## 2018 ACM RecSys [Challenge](http://www.recsyschallenge.com/2018) 1'st Place Solution For Team vl6 [[paper](http://www.cs.toronto.edu/~mvolkovs/recsys2018_challenge.pdf)]
 
 **Team members**: Maksims Volkovs, Himanshu Rai, Zhaoyue Cheng, Yichao Lu (University of Toronto), Ga Wu (University of Toronto, Vector Institute), Scott Sanner (University of Toronto, Vector Institute)
 
