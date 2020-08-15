@@ -4,7 +4,7 @@
 <a href="https://vectorinstitute.ai/"><img src="https://github.com/layer6ai-labs/vl6_recsys2018/blob/master/logos/vector.jpg" width="120" height="70"></a>
 </p>
 
-## 2018 ACM RecSys Challenge 1'st Place Solution For Team vl6 
+## 2018 ACM RecSys Challenge 1'st Place Solution From Team vl6 
 
 **Team members**: Maksims Volkovs (Layer 6), Himanshu Rai (Layer 6), Zhaoyue Cheng (Layer 6), Yichao Lu (University of Toronto), Ga Wu (University of Toronto, Vector Institute), Scott Sanner (University of Toronto, Vector Institute)  
 Contact: maks@layer6.ai  
