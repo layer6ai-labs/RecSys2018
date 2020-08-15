@@ -7,8 +7,9 @@
 ## 2018 ACM RecSys Challenge 1'st Place Solution From Team vl6 
 
 **Team members**: Maksims Volkovs (Layer 6), Himanshu Rai (Layer 6), Zhaoyue Cheng (Layer 6), Yichao Lu (University of Toronto), Ga Wu (University of Toronto, Vector Institute), Scott Sanner (University of Toronto, Vector Institute)  
-Contact: maks@layer6.ai  
 [[paper](http://www.cs.toronto.edu/~mvolkovs/recsys2018_challenge.pdf)][[challenge](http://www.recsyschallenge.com/2018)]
+
+Contact: maks@layer6.ai
 
 <a name="intro"/>
 
